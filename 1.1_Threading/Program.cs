@@ -1,19 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Threading;
-namespace Chapter1
+using System.Threading.Tasks;
+
+namespace _1._1_Threading
 {
     public static class Program
     {
 
-        public static ThreadLocal<int> _field =
-            new ThreadLocal<int>(() =>
-            {
-                return Thread.CurrentThread.ManagedThreadId;
-            });
+        public static ThreadLocal<int> Field =
+            new ThreadLocal<int>(() => Thread.CurrentThread.ManagedThreadId);
 
         //public static void ThreadMethod(object o)
         //{
@@ -92,30 +87,50 @@ namespace Chapter1
         //    Console.WriteLine(t.Result);
         //}
 
+        //public static void Main()
+        //{
+        //    Task<Int32[]> parent = Task.Run(() =>
+        //    {
+        //        var results = new Int32[3];
+
+        //        TaskFactory tf = new TaskFactory(TaskCreationOptions.AttachedToParent,
+        //            TaskContinuationOptions.ExecuteSynchronously);
+
+        //        tf.StartNew(() => results[0] = 0);
+        //        tf.StartNew(() => results[1] = 1);
+        //        tf.StartNew(() => results[2] = 2);
+
+        //        return results;
+
+        //    });
+
+        //    var finalTask = parent.ContinueWith(
+        //        parentTask =>
+        //        {
+        //            foreach (int i in parentTask.Result)
+        //                Console.WriteLine(i);
+        //        });
+        //    finalTask.Wait();
+        //}
+
+        //Can use wait any and Wait all as well - Waitall will wait for all tasks to complete. WaitAny for a the first to finish. 
+
+        // parallel Classes
+        // Used for parallell processing 
+
+        //Static Methods : For, ForEach, and Invoke
+        // parallelism involves taking a certain task and splitting in into a set of related tasks that can be executed concurrently.
+        // should only be used when your code doesnt have to be executed sequentially.
+
         public static void Main()
         {
-            Task<Int32[]> parent = Task.Run(() =>
+            ParallelLoopResult result = Parallel.For(0, 1000, (int i, ParallelLoopState loopState) =>
             {
-                var results = new Int32[3];
-
-                TaskFactory tf = new TaskFactory(TaskCreationOptions.AttachedToParent,
-                    TaskContinuationOptions.ExecuteSynchronously);
-
-                tf.StartNew(() => results[0] = 0);
-                tf.StartNew(() => results[1] = 1);
-                tf.StartNew(() => results[2] = 2);
-
-                return results;
-
+                if (i != 500) return;
+                Console.WriteLine("Breaking Loop");
+                loopState.Break();
+         
             });
-
-            var finalTask = parent.ContinueWith(
-                parentTask =>
-                {
-                    foreach (int i in parentTask.Result)
-                        Console.WriteLine(i);
-                });
-            finalTask.Wait();
         }
     }
 }
